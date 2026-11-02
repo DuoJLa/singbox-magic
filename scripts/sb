@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# sb —— sing-box 多用户节点管理入口
+# 用法: sb [restart|status]
+set -u
+[ "$(id -u)" -eq 0 ] || { echo "请以 root 运行"; exit 1; }
+for dep in jq bash curl openssl tar; do
+  command -v $dep >/dev/null 2>&1 || { echo "缺少依赖: $dep（Debian: apt install $dep / Alpine: apk add $dep）"; exit 1; }
+done
+
+SB_SCRIPTS=/opt/sb-mgr/scripts
+[ -d "$SB_SCRIPTS/lib" ] || { echo "未找到 $SB_SCRIPTS/lib，请先运行安装脚本"; exit 1; }
+
+. "$SB_SCRIPTS/lib/common.sh"
+sb_init_data
+
+case "${1:-}" in
+  restart) . "$SB_SCRIPTS/lib/genconfig.sh"; apply_config; exit $? ;;
+  status)  echo "核心: $(core_status)"; echo "服务: $(svc_action status 2>/dev/null)"; exit 0 ;;
+esac
+
+. "$SB_SCRIPTS/lib/genconfig.sh"
+. "$SB_SCRIPTS/lib/inbound.sh"
+. "$SB_SCRIPTS/lib/user.sh"
+. "$SB_SCRIPTS/lib/core.sh"
+. "$SB_SCRIPTS/lib/backup_ui.sh"
+main_menu
