@@ -16,7 +16,7 @@ SB_LOG=/var/log/sb-mgr.log
 SB_SCRIPTS=/opt/sb-mgr/scripts
 SB_BIN=/usr/local/bin
 SB_CORE=$SB_BIN/sing-box
-SB_GRPCURL=$SB_BIN/bin/grpcurl
+SB_GRPCURL=/opt/sb-mgr/bin/grpcurl
 SB_VERSION="1.0.0"
 SB_PLAN_VERSION=1   # 备份结构版本，恢复时校验/迁移
 
