@@ -269,9 +269,19 @@ user_sub_menu() {
 
 user_menu() {
   while :; do
+    ui_title "用户管理"
     echo "--- 用户列表 ---"; user_list_simple
-    echo "1.添加用户  2.编辑用户  3.绑定入站  4.解绑入站  5.删除用户  6.用户订阅  0.返回"
-    case $(ask "选择: ") in
+    echo
+    menu_item "1" "添加用户"
+    menu_item "2" "编辑用户"
+    menu_item "3" "绑定入站（生成凭证）"
+    menu_item "4" "解绑入站"
+    menu_item "5" "删除用户"
+    menu_item "6" "用户订阅"
+    echo
+    printf "  ${C_RED}[0]${C_RESET} 返回上级\n"
+    echo
+    case $(ask "请选择: ") in
       1) user_add ;;
       2) user_edit ;;
       3) user_bind ;;

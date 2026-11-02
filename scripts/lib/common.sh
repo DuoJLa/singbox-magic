@@ -3,6 +3,26 @@
 # shellcheck shell=bash
 set -u
 
+# ---------- 终端颜色（非 tty 或 NO_COLOR 时自动关闭） ----------
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+  C_RESET='\033[0m'; C_BOLD='\033[1m'
+  C_RED='\033[31m'; C_GREEN='\033[32m'; C_YELLOW='\033[33m'
+  C_BLUE='\033[34m'; C_MAGENTA='\033[35m'; C_CYAN='\033[36m'
+  C_WHITE='\033[37m'; C_GRAY='\033[90m'
+  C_BG_CYAN='\033[46m'; C_BG_BLUE='\033[44m'
+else
+  C_RESET=''; C_BOLD=''
+  C_RED=''; C_GREEN=''; C_YELLOW=''; C_BLUE=''; C_MAGENTA=''
+  C_CYAN=''; C_WHITE=''; C_GRAY=''; C_BG_CYAN=''; C_BG_BLUE=''
+fi
+
+# 菜单条目: menu_item <序号> <文字> [颜色]
+menu_item() { printf "  ${C_CYAN}[%s]${C_RESET} %s\n" "$1" "$2"; }
+# 分隔线
+ui_line()  { printf "${C_GRAY}%s${C_RESET}\n" "$(printf '%.0s─' $(seq 1 44))"; }
+# 小节标题
+ui_title() { printf "\n${C_BOLD}${C_MAGENTA}▶ %s${C_RESET}\n" "$1"; }
+
 SB_ETC=/etc/sing-box-mgr
 SB_DATA=$SB_ETC/data
 SB_USERS=$SB_DATA/users.json

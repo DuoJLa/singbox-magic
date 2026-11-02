@@ -134,15 +134,23 @@ EOF
 
 core_menu() {
   while :; do
-    echo "===== 核心管理 ====="
+    ui_title "核心管理"
     echo "当前: $(core_status)"
-    echo "1.安装/更新核心  2.卸载核心  3.DNS管理  0.返回"
-    case $(ask "选择: ") in
+    echo
+    menu_item "1" "安装/更新核心"
+    menu_item "2" "卸载核心"
+    menu_item "3" "DNS 管理"
+    echo
+    printf "  ${C_RED}[0]${C_RESET} 返回上级\n"
+    echo
+    case $(ask "请选择: ") in
       1)
-        echo "(1) 安装最新版本（官方，无流量统计）"
-        echo "(2) 安装指定版本（官方）"
-        echo "(3) 更新至最新版本（官方）"
-        echo "(4) 安装统计增强版（Tangfffyx 编译，含按用户流量统计）"
+        ui_title "安装/更新核心"
+        menu_item "1" "安装最新版本（官方，无流量统计）"
+        menu_item "2" "安装指定版本（官方）"
+        menu_item "3" "更新至最新版本（官方）"
+        menu_item "4" "安装统计增强版（含按用户流量统计）"
+        echo
         local c=$(ask "选择: ")
         case $c in
           1) core_install latest ;;
@@ -354,9 +362,17 @@ outbound_bind() {
 
 outbound_menu() {
   while :; do
-    echo "===== 出站列表 ====="; outbound_list
-    echo "1.添加出站  2.删除出站  3.出站测试  4.出站绑定  0.返回"
-    case $(ask "选择: ") in
+    ui_title "出站管理"
+    echo "--- 出站列表 ---"; outbound_list
+    echo
+    menu_item "1" "添加出站"
+    menu_item "2" "删除出站"
+    menu_item "3" "出站测试"
+    menu_item "4" "出站绑定"
+    echo
+    printf "  ${C_RED}[0]${C_RESET} 返回上级\n"
+    echo
+    case $(ask "请选择: ") in
       1) outbound_add ;;
       2) outbound_del ;;
       3) outbound_test ;;

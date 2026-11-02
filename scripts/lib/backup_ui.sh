@@ -46,23 +46,39 @@ do_restore() {
 # ============ 主界面 ============
 banner() {
   clear 2>/dev/null || true
-  echo "╔══════════════════════════════════════╗"
-  echo "║   sing-box 多用户节点管理  v$SB_VERSION      ║"
-  echo "╚══════════════════════════════════════╝"
-  echo "系统: $(detect_os) ｜ 模式: $(detect_init)"
-  echo "核心: $(core_status)"
-  echo "----- 用户统计 -----"
+  printf "${C_BOLD}${C_BG_CYAN}${C_WHITE}"
+  echo "                                        "
+  echo "      sing-box 多用户节点管理            "
+  echo "                                        "
+  printf "${C_RESET}"
+  echo "  版本 v$SB_VERSION${C_GRAY}｜sb-mgr${C_RESET}"
+  echo
+  printf "  ${C_GRAY}系统${C_RESET}  ${C_GREEN}%s${C_RESET}   ${C_GRAY}模式${C_RESET} ${C_GREEN}%s${C_RESET}\n" "$(detect_os)" "$(detect_init)"
+  local cs=$(core_status)
+  case "$cs" in
+    运行中*) printf "  ${C_GRAY}核心${C_RESET}  ${C_GREEN}%s${C_RESET}\n" "$cs" ;;
+    已停止*) printf "  ${C_GRAY}核心${C_RESET}  ${C_YELLOW}%s${C_RESET}\n" "$cs" ;;
+    *)       printf "  ${C_GRAY}核心${C_RESET}  ${C_RED}%s${C_RESET}\n" "$cs" ;;
+  esac
+  ui_line
+  printf "${C_BOLD}${C_WHITE}  用户统计${C_RESET}\n"
   user_list_full
-  echo "──────────────────────────────────────"
+  ui_line
 }
 
 main_menu() {
   while :; do
     banner
-    echo " 1.入站管理   2.用户管理   3.核心管理"
-    echo " 4.出站管理   5.备份与恢复 6.更新控制脚本"
-    echo " 0.退出"
-    case $(ask "选择: ") in
+    menu_item "1" "入站管理"
+    menu_item "2" "用户管理"
+    menu_item "3" "核心管理"
+    menu_item "4" "出站管理"
+    menu_item "5" "备份与恢复"
+    menu_item "6" "更新控制脚本"
+    echo
+    printf "  ${C_RED}[0]${C_RESET} 退出\n"
+    echo
+    case $(ask "请选择: ") in
       1) inbound_menu ;;
       2) user_menu ;;
       3) core_menu ;;
@@ -76,8 +92,13 @@ main_menu() {
 }
 
 backup_menu() {
-  echo "1.备份  2.恢复  0.返回"
-  case $(ask "选择: ") in
+  ui_title "备份与恢复"
+  menu_item "1" "备份（导出 base64）"
+  menu_item "2" "恢复（粘贴 base64）"
+  echo
+  printf "  ${C_RED}[0]${C_RESET} 返回上级\n"
+  echo
+  case $(ask "请选择: ") in
     1) do_backup ;;
     2) do_restore ;;
     0) return ;;

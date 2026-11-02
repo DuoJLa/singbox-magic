@@ -38,7 +38,7 @@ ask_tls_files() { # 输出 "cert|key"
 }
 
 inbound_list_menu() {
-  echo "===== 入站列表 ====="
+  echo "--- 入站列表 ---"
   if [ "$(jq length "$SB_INBOUNDS")" -eq 0 ]; then echo "（空）"; return; fi
   jq -r --argjson users "$(cat "$SB_USERS")" -f- "$SB_INBOUNDS" <<'EOF' 2>/dev/null || \
   jq -r '.[] | "\(.id)\t\(.name)\t\(.proto)\t0"' "$SB_INBOUNDS"
@@ -229,9 +229,16 @@ inbound_del() {
 
 inbound_menu() {
   while :; do
+    ui_title "入站管理"
     inbound_list_menu
-    echo "1.添加入站  2.编辑入站  3.删除入站  0.返回"
-    case $(ask "选择: ") in
+    echo
+    menu_item "1" "添加入站"
+    menu_item "2" "编辑入站"
+    menu_item "3" "删除入站"
+    echo
+    printf "  ${C_RED}[0]${C_RESET} 返回上级\n"
+    echo
+    case $(ask "请选择: ") in
       1) inbound_add ;;
       2) inbound_edit ;;
       3) inbound_del ;;
