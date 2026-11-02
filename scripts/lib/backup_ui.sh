@@ -95,12 +95,12 @@ update_self() {
   fi
   echo "从 $repo 拉取最新脚本..."
   local tmp=$(mktemp -d)
-  if curl -fsLm 120 -o "$tmp/scripts.tar.gz" "https://github.com/${repo}/archive/refs/heads/main.tar.gz"; then
-    tar xzf "$tmp/scripts.tar.gz" -C "$tmp"
-    local src=$(find "$tmp" -maxdepth 2 -name lib -type d | head -1)
-    if [ -n "$src" ]; then
-      cp -r "$src"/../*.sh "$src"/. "$SB_SCRIPTS"/ 2>/dev/null
-      cp -r "$src"/* "$SB_SCRIPTS/lib/" 2>/dev/null
+  if curl -fsLm 120 -o "$tmp/repo.tar.gz" "https://github.com/${repo}/archive/refs/heads/main.tar.gz"; then
+    tar xzf "$tmp/repo.tar.gz" -C "$tmp"
+    local src=$(find "$tmp" -maxdepth 3 -path '*/scripts/lib' -type d | head -1 | xargs dirname)
+    if [ -n "$src" ] && [ -d "$src/lib" ]; then
+      cp "$src"/sb "$src"/sb-stats.sh "$SB_SCRIPTS"/
+      cp "$src"/lib/*.sh "$SB_SCRIPTS/lib/"
       sb_log "scripts updated from $repo"
       echo "已更新。重启 sb 生效。"
     else

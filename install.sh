@@ -22,14 +22,29 @@ else
   echo "未识别系统，请自行安装: ${PKGS_BASH[*]}"
 fi
 
-# 2. 复制脚本
+# 2. 获取脚本源：本仓库（单文件安装时自动从 GitHub 拉取完整包）
+REPO="DuoJLa/singbox-magic"
+if [ -d "$SRC_DIR/scripts/lib" ]; then
+  SRC="$SRC_DIR"   # 完整包安装（tar 解压后）
+else
+  echo "从 GitHub 拉取脚本..."
+  DL=$(mktemp -d)
+  if ! curl -fsLm 120 -o "$DL/repo.tar.gz" "https://github.com/${REPO}/archive/refs/heads/main.tar.gz"; then
+    echo "下载失败，请检查网络或手动安装: git clone https://github.com/${REPO}.git"; exit 1
+  fi
+  tar xzf "$DL/repo.tar.gz" -C "$DL"
+  SRC=$(find "$DL" -maxdepth 2 -name scripts -type d | head -1 | xargs dirname)
+  [ -n "$SRC" ] || { echo "仓库结构异常"; exit 1; }
+fi
+
+# 3. 复制脚本
 mkdir -p "$SB_ETC/data" "$SB_ETC/subs" "$SB_SCRIPTS/lib" "$SB_BIN/bin"
-cp "$SRC_DIR/sb" "$SB_SCRIPTS/sb"
-cp "$SRC_DIR/sb-stats.sh" "$SB_SCRIPTS/sb-stats.sh"
-cp "$SRC_DIR"/lib/*.sh "$SB_SCRIPTS/lib/"
+cp "$SRC/scripts/sb" "$SB_SCRIPTS/sb"
+cp "$SRC/scripts/sb-stats.sh" "$SB_SCRIPTS/sb-stats.sh"
+cp "$SRC"/scripts/lib/*.sh "$SB_SCRIPTS/lib/"
 chmod +x "$SB_SCRIPTS"/sb*.sh
 
-# 3. 注册 sb 命令
+# 4. 注册 sb 命令
 ln -sf "$SB_SCRIPTS/sb" "$SB_BIN/sb"
 
 # 4. 初始化配置
@@ -37,7 +52,7 @@ ln -sf "$SB_SCRIPTS/sb" "$SB_BIN/sb"
 SB_API_PORT=15490
 SB_API_TOKEN="$(cat /proc/sys/kernel/random/uuid)"
 SB_DNS="1.1.1.1,8.8.8.8"
-SB_UPDATE_REPO=""
+SB_UPDATE_REPO="DuoJLa/singbox-magic"
 SB_STATS_ENABLED=0
 EOF
 [ -f "$SB_ETC/data/users.json" ] || echo '[]' > "$SB_ETC/data/users.json"
